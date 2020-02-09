@@ -20,37 +20,10 @@ class BearApi:
             assert response.text != "EMPTY"
             return int(response.text)
         else:
-            return response.status_code
+            return response
 
 
-
-    def create_bear_and_assert(self, bear_type, bear_name, bear_age):
-        """
-        :param bear_type: вид медведя
-        :param bear_name: имя медведя
-        :param bear_age: возраст медведя
-        :return:
-        Создание медведя и проверка, что он создался правильно
-        """
-        bear_id = self.create_bear(bear_type, bear_name, bear_age)
-        etalon_bear = CreateJson.bear_etalon_json(bear_id, bear_type, bear_name, bear_age)
-        bear_json = self.get_bear_by_id(bear_id).json()
-        assert etalon_bear == bear_json
-
-    def create_bear_and_assert_negative(self, bear_type, bear_name, bear_age):
-        """
-        :param bear_type: вид медведя
-        :param bear_name: имя медведя
-        :param bear_age: возраст медведя
-        :return:
-        Создание медведя с неправильнымии параметрами
-        """
-        response = self.create_bear(bear_type, bear_name, bear_age)
-        assert response == 500
-
-
-
-    def get_all_bears_and_assert(self, allBears):
+    def get_all_bears(self, allBears):
         """
         :param allBears: Лист из всех медведей для сравнения со списком медведей на сервере
         :return:
@@ -59,7 +32,7 @@ class BearApi:
         response = requests.get(url + '/bear')
         assert 200 == response.status_code
         allBearsFromServer = response.json()
-        assert allBears == allBearsFromServer
+        return allBearsFromServer
 
     def get_bear_by_id(self, id):
         """
@@ -69,7 +42,6 @@ class BearApi:
         """
         response = requests.get(url + '/bear/%s' % id)
         assert 200 == response.status_code
-        assert response.text != "EMPTY"
         return response
 
     def update_bear_by_id(self, id, bear_type, bear_name, bear_age):
@@ -105,25 +77,10 @@ class BearApi:
 
         :param id: id медведя
         :return:
-        удаление всех медведей
+        удаление медведя по id
         """
         response = requests.delete(url + '/bear/%s' % id)
         assert 200 == response.status_code
-        response = requests.get(url + '/bear/%s' % id)
-        assert response.text == "EMPTY"
-
-    def check_bear_by_attributes(self, bear_id, bear_type, bear_name, bear_age):
-        """
-        Сравнение медведя по его параметрам
-        :param bear_id: id медведя
-        :param bear_type: вид медведя
-        :param bear_name: имя медведя
-        :param bear_age: возраст медведя
-        :return:
-        """
-        etalon_bear = CreateJson.bear_etalon_json(bear_id, bear_type, bear_name, bear_age)
-        bear_json = self.get_bear_by_id(bear_id).json()
-        assert etalon_bear == bear_json
 
 
     def create_bear_by_list(self, bear):
